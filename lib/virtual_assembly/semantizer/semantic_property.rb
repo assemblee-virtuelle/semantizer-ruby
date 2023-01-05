@@ -31,7 +31,7 @@
 #
 # You should use a block to pass the value like so:
 # SemanticProperty.new("http://xmlns.com/foaf/0.1/name") {self.name}
-class SemanticProperty
+class Semantizer::SemanticProperty
 
     # The name of the property. It generally points to an uri
     # like "http://xmlns.com/foaf/0.1/name" or it is used to 

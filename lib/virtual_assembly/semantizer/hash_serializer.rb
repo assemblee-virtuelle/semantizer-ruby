@@ -23,7 +23,7 @@
 #
 # The HashSerializer will return the following Hash:
 # {"http://xmlns.com/foaf/0.1/name" => "John"}.
-class HashSerializer
+class Semantizer::HashSerializer
 
     # This is the main method to begin the serialization.
     #

@@ -15,7 +15,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-require_relative 'SemanticProperty'
+require 'virtual_assembly/semantizer/semantic_property'
 
 # The SemanticObject module is designed to add linked data
 # to classical objects.
@@ -26,7 +26,7 @@ require_relative 'SemanticProperty'
 # For example, a Person object including this module could register 
 # in its initializer method a semantic property for its name like:
 # Person.registerSemanticProperty("http://xmlns.com/foaf/0.1/name") {self.name}
-module SemanticObject
+module Semantizer::SemanticObject
 
     # The semantic ID implements the concept of linked data ID.
     #
@@ -153,7 +153,7 @@ module SemanticObject
 
             # Create
             else
-                @semanticProperties.push(SemanticProperty.new(name, &valueGetter))
+                @semanticProperties.push(Semantizer::SemanticProperty.new(name, &valueGetter))
                 index = @semanticProperties.count - 1
                 @semanticPropertiesNameIndex.store(name, index);
             end

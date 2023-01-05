@@ -25,9 +25,11 @@ registerSemanticProperty("http://xmlns.com/foaf/0.1/name") {self.name}
 
 The Person class should now looks like:
 ```
+require 'virtual_assembly/semantizer'
+
 class Person
 
-    include SemanticObject
+    include Semantizer::SemanticObject
 
     attr_accessor :name
 
@@ -44,7 +46,7 @@ Then you can serialize this object to a simple `Hash` object:
 ```
 person = Person.new("John")
 person.semanticId = "http://platform.example/John"
-output = person.serialize(HashSerializer.new)
+output = person.serialize(Semantizer::HashSerializer.new)
 ```
 
 `puts(output)` will output:
