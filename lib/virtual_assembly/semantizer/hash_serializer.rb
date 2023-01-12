@@ -23,7 +23,7 @@
 #
 # The HashSerializer will return the following Hash:
 # {"http://xmlns.com/foaf/0.1/name" => "John"}.
-class Semantizer::HashSerializer
+class VirtualAssembly::Semantizer::HashSerializer
 
     # This is the main method to begin the serialization.
     #
@@ -46,7 +46,7 @@ class Semantizer::HashSerializer
 
             # In case the property is a SemanticObject, we get its semanticId 
             # or we process it if it is a blank node.
-            elsif (value.is_a? SemanticObject)
+            elsif (value.class < VirtualAssembly::Semantizer::SemanticObject)
                 if (value.isBlankNode?)
                     result[name] = process(value)
                 else
@@ -80,7 +80,7 @@ class Semantizer::HashSerializer
 
                 # In case the collection contains SemanticObject we have to process 
                 # the blank nodes or return the semantic id.
-                elsif type == SemanticObject
+                elsif type < VirtualAssembly::Semantizer::SemanticObject
                     values.each do |item|
                         if (item.isBlankNode?)
                             collection.push(process(item))

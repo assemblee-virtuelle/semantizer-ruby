@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = "virtual_assembly-semantizer"
-  s.version     = "1.0.0-alpha"
+  s.version     = "1.0.0"
   s.summary     = "Semantizer"
   s.description = "A library to add linked data to your models"
   s.authors     = ["Maxime Lecoq"]

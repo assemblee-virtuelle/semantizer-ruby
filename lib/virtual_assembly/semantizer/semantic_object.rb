@@ -26,7 +26,7 @@ require 'virtual_assembly/semantizer/semantic_property'
 # For example, a Person object including this module could register 
 # in its initializer method a semantic property for its name like:
 # Person.registerSemanticProperty("http://xmlns.com/foaf/0.1/name") {self.name}
-module Semantizer::SemanticObject
+module VirtualAssembly::Semantizer::SemanticObject
 
     # The semantic ID implements the concept of linked data ID.
     #
@@ -153,7 +153,7 @@ module Semantizer::SemanticObject
 
             # Create
             else
-                @semanticProperties.push(Semantizer::SemanticProperty.new(name, &valueGetter))
+                @semanticProperties.push(VirtualAssembly::Semantizer::SemanticProperty.new(name, &valueGetter))
                 index = @semanticProperties.count - 1
                 @semanticPropertiesNameIndex.store(name, index);
             end
