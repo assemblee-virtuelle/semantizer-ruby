@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = "virtual_assembly-semantizer"
-  s.version     = "1.0.0"
+  s.version     = "1.0.1"
   s.summary     = "Semantizer"
   s.description = "A library to add linked data to your models"
   s.authors     = ["Maxime Lecoq"]
@@ -9,4 +9,6 @@ Gem::Specification.new do |s|
   s.homepage    =
     "https://github.com/assemblee-virtuelle/semantizer-ruby/"
   s.license       = "MIT"
+
+  s.add_runtime_dependency "json-ld", "~> 3.2", ">= 3.2.3"
 end
