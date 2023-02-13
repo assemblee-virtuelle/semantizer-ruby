@@ -55,7 +55,9 @@ class VirtualAssembly::Semantizer::HashSerializer
 
             # In case the property is an Array, we export each item.
             elsif (value.class == Array)
-                result[name] = exportCollection(value)
+                if (!value.empty?)
+                    result[name] = exportCollection(value)
+                end
 
             else 
                 raise "The type of the property '" + name + "' is '" + value.class.to_s + "' but a primitive, a SemanticObject or an Array is required."
