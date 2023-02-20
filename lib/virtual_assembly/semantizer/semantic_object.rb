@@ -58,10 +58,8 @@ module VirtualAssembly::Semantizer::SemanticObject
 
     # If the semanticId is nil, the object will be treated as a blank node.
     def initialize(semanticId = nil, semanticType = nil)
-        @semanticId = semanticId
-        @semanticType = semanticType
         @semanticProperties = Array.new
-
+        
         # This Hash allows us to find a property using its name.
         #
         # Hash<String, Integer>
@@ -70,6 +68,10 @@ module VirtualAssembly::Semantizer::SemanticObject
         # The value store the index of the property in the 
         # semanticProperties array (Integer).
         @semanticPropertiesNameIndex = Hash.new
+
+        # Ensure to call the setter methods
+        self.semanticId = semanticId
+        self.semanticType = semanticType
     end
 
     def hasSemanticProperty?(name)
