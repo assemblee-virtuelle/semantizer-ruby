@@ -25,6 +25,11 @@
 # {"http://xmlns.com/foaf/0.1/name" => "John"}.
 class VirtualAssembly::Semantizer::HashSerializer
 
+    # The inputContext must be a hash like { prefix => uri }
+    def initialize(inputContext = nil)
+        @inputContext = inputContext
+    end
+
     # This is the main method to begin the serialization.
     #
     # The subject should be a SemanticObject.
@@ -33,7 +38,7 @@ class VirtualAssembly::Semantizer::HashSerializer
 
         # We iterate over all the semantic properties of the subject.
         subject.semanticProperties.each do |property|
-            name = property.name
+            name = @inputContext? self.prefixName(property.name): property.name
             value = property.value
 
             if (value == nil)
@@ -67,7 +72,17 @@ class VirtualAssembly::Semantizer::HashSerializer
         return result;
     end
 
-    private 
+    private
+
+        # Replace each URI with its prefix
+        def prefixName(name)
+            @inputContext.each do |prefix, uri|
+                if (!name.start_with?("@") && name.start_with?(uri))
+                    return name.sub(uri, prefix + ':')
+                end
+            end
+            return name
+        end
     
         # Serialize a collection of values.
         def exportCollection(values)
