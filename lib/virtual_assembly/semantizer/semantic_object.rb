@@ -88,8 +88,16 @@ module VirtualAssembly
       # Given the name of the property, it returns the value
       # associated to a property of this object.
       def semanticPropertyValue(name)
-        index = @semanticPropertiesNameIndex.fetch(name, nil)
-        !index.nil? ? @semanticProperties[index].value : nil
+        semanticProperty(name)&.value
+      end
+
+      # Given its name, returns the corresponding SemanticProperty
+      # stored by this object or nil if the property does not exist.
+      def semanticProperty(name)
+        index = @semanticPropertiesNameIndex.fetch(name)
+        @semanticProperties.at(index)
+      rescue StandardError
+        nil
       end
 
       # Use this method to append a semantic property to this object.
@@ -113,7 +121,8 @@ module VirtualAssembly
       # This should be a String or nil.
       def semanticId=(uri)
         @semanticId = uri
-        registerSemanticProperty('@id') { semanticId }
+        property = registerSemanticProperty('@id') { semanticId }
+        property.valueSetter = ->(value) { @semanticId = value }
       end
 
       # Sets the semantic type of the object and registers the
@@ -129,7 +138,8 @@ module VirtualAssembly
       # This should be a String or nil.
       def semanticType=(type)
         @semanticType = type
-        registerSemanticProperty('@type') { semanticType }
+        property = registerSemanticProperty('@type') { semanticType }
+        property.valueSetter = ->(value) { @semanticType = value }
       end
 
       # Serialize all the semantic properties of this object
@@ -151,24 +161,17 @@ module VirtualAssembly
       def createOrUpdateSemanticProperty(name, valueGetter)
         # Update
         if hasSemanticProperty?(name)
-          semanticProperty = findSemanticProperty(name)
+          semanticProperty = semanticProperty(name)
           semanticProperty.valueGetter = valueGetter unless semanticProperty.nil?
 
         # Create
         else
-          @semanticProperties.push(VirtualAssembly::Semantizer::SemanticProperty.new(name, &valueGetter))
+          semanticProperty = VirtualAssembly::Semantizer::SemanticProperty.new(name, &valueGetter)
+          @semanticProperties.push(semanticProperty)
           index = @semanticProperties.count - 1
           @semanticPropertiesNameIndex.store(name, index)
         end
-      end
-
-      # Given its name, returns the corresponding SemanticProperty
-      # stored by this object or nil if the property does not exist.
-      def findSemanticProperty(name)
-        index = @semanticPropertiesNameIndex.fetch(name)
-        @semanticProperties.at(index)
-      rescue StandardError
-        nil
+        semanticProperty
       end
     end
   end
