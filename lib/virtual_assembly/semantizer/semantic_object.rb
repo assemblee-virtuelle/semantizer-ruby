@@ -52,33 +52,26 @@ module VirtualAssembly
       # This should be a String or nil.
       attr_accessor :semanticType
 
-      # This Array stores the semantic properties of the object.
-      # To append a SemanticProperty, use the dedicated
-      # registerSemanticProperty method. You should pass the value
-      # of the property as a block (callback) like so:
-      # registerSemanticProperty("http://xmlns.com/foaf/0.1/name") {self.name}.
-      attr_reader :semanticProperties
-
       # If the semanticId is nil, the object will be treated as a blank node.
       def initialize(semanticId = nil, semanticType = nil)
-        @semanticProperties = []
-
-        # This Hash allows us to find a property using its name.
-        #
-        # Hash<String, Integer>
-        #
-        # The key store the name of a property (String).
-        # The value store the index of the property in the
-        # semanticProperties array (Integer).
-        @semanticPropertiesNameIndex = {}
+        @semanticPropertiesMap = {}
 
         # Ensure to call the setter methods
         self.semanticId = semanticId
         self.semanticType = semanticType
       end
 
+      # This Array stores the semantic properties of the object.
+      # To append a SemanticProperty, use the dedicated
+      # registerSemanticProperty method. You should pass the value
+      # of the property as a block (callback) like so:
+      # registerSemanticProperty("http://xmlns.com/foaf/0.1/name") {self.name}.
+      def semanticProperties
+        @semanticPropertiesMap.values
+      end
+
       def hasSemanticProperty?(name)
-        @semanticPropertiesNameIndex.include?(name)
+        @semanticPropertiesMap.key?(name)
       end
 
       def isBlankNode?
@@ -94,10 +87,7 @@ module VirtualAssembly
       # Given its name, returns the corresponding SemanticProperty
       # stored by this object or nil if the property does not exist.
       def semanticProperty(name)
-        index = @semanticPropertiesNameIndex.fetch(name)
-        @semanticProperties.at(index)
-      rescue StandardError
-        nil
+        @semanticPropertiesMap[name]
       end
 
       # Use this method to append a semantic property to this object.
@@ -161,17 +151,15 @@ module VirtualAssembly
       def createOrUpdateSemanticProperty(name, valueGetter)
         # Update
         if hasSemanticProperty?(name)
-          semanticProperty = semanticProperty(name)
-          semanticProperty.valueGetter = valueGetter unless semanticProperty.nil?
+          property = semanticProperty(name)
+          property&.valueGetter = valueGetter
 
         # Create
         else
-          semanticProperty = VirtualAssembly::Semantizer::SemanticProperty.new(name, &valueGetter)
-          @semanticProperties.push(semanticProperty)
-          index = @semanticProperties.count - 1
-          @semanticPropertiesNameIndex.store(name, index)
+          property = VirtualAssembly::Semantizer::SemanticProperty.new(name, &valueGetter)
+          @semanticPropertiesMap[name] = property
         end
-        semanticProperty
+        property
       end
     end
   end
