@@ -48,6 +48,11 @@ module VirtualAssembly
       # This should be a Proc passed as a Block.
       attr_accessor :valueGetter
 
+      # The function to call to store a new value.
+      #
+      # This should be a Proc
+      attr_accessor :valueSetter
+
       # @param name The name of the property, like
       # "http://xmlns.com/foaf/0.1/name" or "@id" for instance.
       #
@@ -61,6 +66,11 @@ module VirtualAssembly
       # Fetch and returns the value associated to this property.
       def value
         @valueGetter.call
+      end
+
+      # Stores a new value for this property.
+      def value=(new_value)
+        @valueSetter.call(new_value)
       end
     end
   end

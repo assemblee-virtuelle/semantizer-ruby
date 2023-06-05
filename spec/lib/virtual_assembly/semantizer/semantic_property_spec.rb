@@ -10,4 +10,15 @@ describe VirtualAssembly::Semantizer::SemanticProperty do
     property = described_class.new('@id') { 'person/42' }
     expect(property.value).to eq 'person/42'
   end
+
+  it 'can store a setter' do
+    weather = "rain"
+
+    property = described_class.new("weather") { weather }
+    property.valueSetter = -> (value) { weather = value }
+
+    expect { property.value = "sunshine" }
+      .to change { property.value }
+      .from("rain").to("sunshine")
+  end
 end
