@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright © 2023 Maxime Lecoq, <maxime@lecoqlibre.fr>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
@@ -23,153 +25,151 @@ require 'virtual_assembly/semantizer/semantic_property'
 # A semanticObject holds semantic properties (SemanticProperty)
 # that refers to linked data concepts.
 #
-# For example, a Person object including this module could register 
+# For example, a Person object including this module could register
 # in its initializer method a semantic property for its name like:
 # Person.registerSemanticProperty("http://xmlns.com/foaf/0.1/name") {self.name}
-module VirtualAssembly::Semantizer::SemanticObject
+module VirtualAssembly
+  module Semantizer
+    module SemanticObject
+      # The semantic ID implements the concept of linked data ID.
+      #
+      # This ID is an uri pointing to the location of the object
+      # on the web like "https://mywebsite/myobject" for instance.
+      #
+      # If a SemanticObject doesn't define its ID, it
+      # will be considered as a blank node.
+      #
+      # This should be a String or nil.
+      attr_accessor :semanticId
 
-    # The semantic ID implements the concept of linked data ID.
-    #
-    # This ID is an uri pointing to the location of the object
-    # on the web like "https://mywebsite/myobject" for instance.
-    #
-    # If a SemanticObject doesn't define its ID, it
-    # will be considered as a blank node.
-    #
-    # This should be a String or nil.
-    attr_accessor :semanticId
+      # The semantic type implements the concept of linked data type
+      # (also called class).
+      #
+      # This type is an uri pointing to the location of the linked
+      # data concept on the web like "http://xmlns.com/foaf/0.1/Person"
+      # for instance.
+      #
+      # This should be a String or nil.
+      attr_accessor :semanticType
 
-    # The semantic type implements the concept of linked data type 
-    # (also called class).
-    #
-    # This type is an uri pointing to the location of the linked 
-    # data concept on the web like "http://xmlns.com/foaf/0.1/Person"
-    # for instance.
-    #
-    # This should be a String or nil.
-    attr_accessor :semanticType
+      # This Array stores the semantic properties of the object.
+      # To append a SemanticProperty, use the dedicated
+      # registerSemanticProperty method. You should pass the value
+      # of the property as a block (callback) like so:
+      # registerSemanticProperty("http://xmlns.com/foaf/0.1/name") {self.name}.
+      attr_reader :semanticProperties
 
-    # This Array stores the semantic properties of the object.
-    # To append a SemanticProperty, use the dedicated
-    # registerSemanticProperty method. You should pass the value 
-    # of the property as a block (callback) like so:
-    # registerSemanticProperty("http://xmlns.com/foaf/0.1/name") {self.name}.
-    attr_reader :semanticProperties
+      # If the semanticId is nil, the object will be treated as a blank node.
+      def initialize(semanticId = nil, semanticType = nil)
+        @semanticProperties = []
 
-    # If the semanticId is nil, the object will be treated as a blank node.
-    def initialize(semanticId = nil, semanticType = nil)
-        @semanticProperties = Array.new
-        
         # This Hash allows us to find a property using its name.
         #
         # Hash<String, Integer>
         #
         # The key store the name of a property (String).
-        # The value store the index of the property in the 
+        # The value store the index of the property in the
         # semanticProperties array (Integer).
-        @semanticPropertiesNameIndex = Hash.new
+        @semanticPropertiesNameIndex = {}
 
         # Ensure to call the setter methods
         self.semanticId = semanticId
         self.semanticType = semanticType
-    end
+      end
 
-    def hasSemanticProperty?(name)
-        return @semanticPropertiesNameIndex.include?(name)
-    end
+      def hasSemanticProperty?(name)
+        @semanticPropertiesNameIndex.include?(name)
+      end
 
-    def isBlankNode?
-        return @semanticId == nil || @semanticId == ""
-    end
+      def isBlankNode?
+        @semanticId.nil? || @semanticId == ''
+      end
 
-    # Given the name of the property, it returns the value
-    # associated to a property of this object.
-    def semanticPropertyValue(name)
+      # Given the name of the property, it returns the value
+      # associated to a property of this object.
+      def semanticPropertyValue(name)
         index = @semanticPropertiesNameIndex.fetch(name, nil)
-        return index != nil ? @semanticProperties[index].value : nil;
-    end
+        !index.nil? ? @semanticProperties[index].value : nil
+      end
 
-    # Use this method to append a semantic property to this object.
-    # The value of the property should be passed as a block so its
-    # value would be up to date when we will access it.
-    def registerSemanticProperty(name, &valueGetter)
+      # Use this method to append a semantic property to this object.
+      # The value of the property should be passed as a block so its
+      # value would be up to date when we will access it.
+      def registerSemanticProperty(name, &valueGetter)
         createOrUpdateSemanticProperty(name, valueGetter)
-    end
+      end
 
-    # Sets the semantic id of the object and registers the 
-    # corresponding semantic property.
-    #
-    # The semantic ID implements the concept of linked data ID.
-    #
-    # This ID is an uri pointing to the location of the object
-    # on the web like "https://mywebsite/myobject" for instance.
-    #
-    # If a SemanticObject doesn't define its ID, it
-    # will be considered as a blank node.
-    #
-    # This should be a String or nil.
-    def semanticId=(uri)
+      # Sets the semantic id of the object and registers the
+      # corresponding semantic property.
+      #
+      # The semantic ID implements the concept of linked data ID.
+      #
+      # This ID is an uri pointing to the location of the object
+      # on the web like "https://mywebsite/myobject" for instance.
+      #
+      # If a SemanticObject doesn't define its ID, it
+      # will be considered as a blank node.
+      #
+      # This should be a String or nil.
+      def semanticId=(uri)
         @semanticId = uri
-        registerSemanticProperty("@id") {self.semanticId}
-    end
+        registerSemanticProperty('@id') { semanticId }
+      end
 
-    # Sets the semantic type of the object and registers the 
-    # corresponding semantic property.
-    #
-    # The semantic type implements the concept of linked data type
-    # (also called class).
-    #
-    # This type is an uri pointing to the location of the linked 
-    # data concept on the web like "http://xmlns.com/foaf/0.1/Person"
-    # for instance.
-    #
-    # This should be a String or nil.
-    def semanticType=(type)
+      # Sets the semantic type of the object and registers the
+      # corresponding semantic property.
+      #
+      # The semantic type implements the concept of linked data type
+      # (also called class).
+      #
+      # This type is an uri pointing to the location of the linked
+      # data concept on the web like "http://xmlns.com/foaf/0.1/Person"
+      # for instance.
+      #
+      # This should be a String or nil.
+      def semanticType=(type)
         @semanticType = type
-        registerSemanticProperty("@type") {self.semanticType}
-    end
+        registerSemanticProperty('@type') { semanticType }
+      end
 
-    # Serialize all the semantic properties of this object
-    # to an output format.
-    #
-    # You could use the HashSerializer to export as a Hash.
-    # This Hash should be then exported to JSON for instance.
-    def serialize(serializer)
-        return serializer.process(self)
-    end
+      # Serialize all the semantic properties of this object
+      # to an output format.
+      #
+      # You could use the HashSerializer to export as a Hash.
+      # This Hash should be then exported to JSON for instance.
+      def serialize(serializer)
+        serializer.process(self)
+      end
 
-    protected
+      protected
 
-        # If the semantic property already exist in this object, this
-        # method will simply update the valueGetter of the property.
-        #
-        # If this object does not holds the property, the new property
-        # will be added into the semanticProperties Array of this object.
-        def createOrUpdateSemanticProperty(name, valueGetter)
-            # Update
-            if (hasSemanticProperty?(name))
-                semanticProperty = findSemanticProperty(name)
-                if (semanticProperty != nil)
-                    semanticProperty.valueGetter = valueGetter
-                end
+      # If the semantic property already exist in this object, this
+      # method will simply update the valueGetter of the property.
+      #
+      # If this object does not holds the property, the new property
+      # will be added into the semanticProperties Array of this object.
+      def createOrUpdateSemanticProperty(name, valueGetter)
+        # Update
+        if hasSemanticProperty?(name)
+          semanticProperty = findSemanticProperty(name)
+          semanticProperty.valueGetter = valueGetter unless semanticProperty.nil?
 
-            # Create
-            else
-                @semanticProperties.push(VirtualAssembly::Semantizer::SemanticProperty.new(name, &valueGetter))
-                index = @semanticProperties.count - 1
-                @semanticPropertiesNameIndex.store(name, index);
-            end
+        # Create
+        else
+          @semanticProperties.push(VirtualAssembly::Semantizer::SemanticProperty.new(name, &valueGetter))
+          index = @semanticProperties.count - 1
+          @semanticPropertiesNameIndex.store(name, index)
         end
+      end
 
-        # Given its name, returns the corresponding SemanticProperty
-        # stored by this object or nil if the property does not exist.
-        def findSemanticProperty(name)
-            begin
-                index = @semanticPropertiesNameIndex.fetch(name)
-                return @semanticProperties.at(index)
-            rescue
-                return nil
-            end
-        end
-
+      # Given its name, returns the corresponding SemanticProperty
+      # stored by this object or nil if the property does not exist.
+      def findSemanticProperty(name)
+        index = @semanticPropertiesNameIndex.fetch(name)
+        @semanticProperties.at(index)
+      rescue StandardError
+        nil
+      end
+    end
+  end
 end
