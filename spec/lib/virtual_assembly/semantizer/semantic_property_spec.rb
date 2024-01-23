@@ -21,4 +21,15 @@ describe VirtualAssembly::Semantizer::SemanticProperty do
       .to change { property.value }
       .from("rain").to("sunshine")
   end
+
+  it 'can be compared' do
+    green = described_class.new("colour") { "green" }
+    green_colour = described_class.new("colour") { "green" }
+    green_grass = described_class.new("ground_type") { "green" }
+    purple = described_class.new("colour") { "purple" }
+
+    expect(green).to eq green_colour
+    expect(green).to_not eq green_grass
+    expect(green).to_not eq purple
+  end
 end

@@ -141,6 +141,10 @@ module VirtualAssembly
         serializer.process(self)
       end
 
+      def ==(other)
+        semanticProperties == other.semanticProperties
+      end
+
       protected
 
       # If the semantic property already exist in this object, this

@@ -72,6 +72,10 @@ module VirtualAssembly
       def value=(new_value)
         @valueSetter.call(new_value)
       end
+
+      def ==(other)
+        name == other.name && value == other.value
+      end
     end
   end
 end
