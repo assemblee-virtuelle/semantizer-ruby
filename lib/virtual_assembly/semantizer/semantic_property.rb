@@ -74,7 +74,7 @@ module VirtualAssembly
       end
 
       def ==(other)
-        name == other.name && value == other.value
+        other && name == other.name && value == other.value
       end
     end
   end

@@ -37,6 +37,7 @@ describe VirtualAssembly::Semantizer::SemanticObject do
     expect(object).to eq object.clone
     expect(object).to eq other_clazz.new
 
+    expect(object).to_not eq nil
     expect(object).to_not eq other_clazz.new("id5")
     expect(object).to_not eq other_clazz.new(nil, "typeA")
 

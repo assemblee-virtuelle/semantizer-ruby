@@ -31,5 +31,6 @@ describe VirtualAssembly::Semantizer::SemanticProperty do
     expect(green).to eq green_colour
     expect(green).to_not eq green_grass
     expect(green).to_not eq purple
+    expect(green).to_not eq nil
   end
 end
