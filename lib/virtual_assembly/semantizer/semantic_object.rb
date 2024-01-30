@@ -142,6 +142,8 @@ module VirtualAssembly
       end
 
       def ==(other)
+        return false unless other.respond_to?(:semanticProperties)
+
         semanticProperties == other.semanticProperties
       end
 
